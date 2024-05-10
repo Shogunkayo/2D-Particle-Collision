@@ -48,8 +48,8 @@ int main (int argc, char *argv[]) {
 
         // deltaTime
         // -------------------
-        float deltaTime = 0.0f;
-        float lastFrame = 0.0f;
+        float deltaTime = 1.0f / 60.0f;
+        // float lastFrame = 0.0f;
 
         while (!glfwWindowShouldClose(window)) {
             // input
@@ -58,9 +58,9 @@ int main (int argc, char *argv[]) {
 
             // calculate delta time
             // --------------------
-            float currentFrame = glfwGetTime();
-            deltaTime = currentFrame - lastFrame;
-            lastFrame = currentFrame;
+            // float currentFrame = glfwGetTime();
+            // deltaTime = currentFrame - lastFrame;
+            // lastFrame = currentFrame;
 
             // render
             // ------
@@ -69,7 +69,8 @@ int main (int argc, char *argv[]) {
 
             containerBG.Draw();
             container.Draw();
-            circle.Draw(deltaTime);
+            circle.Update(deltaTime);
+            circle.Draw();
 
             // swap buffers and poll IO events
             // -------------------------------

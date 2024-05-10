@@ -27,5 +27,6 @@ public:
 
     void Bind();
     void Unbind();
-    void Draw(float deltaTime);
+    void Draw();
+    void Update(float deltaTime);
 };

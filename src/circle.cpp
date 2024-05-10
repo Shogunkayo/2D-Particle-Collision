@@ -6,7 +6,6 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 #include <random>
 #include <string>
 
@@ -24,8 +23,8 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
         1, 2, 3
     };
 
-    float radius_list[25] = {10.0f, 30.0f, 10.0f, 20.0f, 10.0f, 30.0f, 10.0f, 20.0f, 10.0f, 20.0f, 10.0f, 20.0f,
-        10.0f, 10.0f, 40.0f, 30.0f, 30.0f, 20.0f, 20.0f, 10.0f, 20.0f, 20.0f, 30.0f, 20.0f, 40.0f};
+    float radius_list[25] = {10.0f, 30.0f, 10.0f, 15.0f, 10.0f, 25.0f, 10.0f, 15.0f, 10.0f, 15.0f, 10.0f, 15.0f,
+        10.0f, 10.0f, 35.0f, 20.0f, 20.0f, 15.0f, 15.0f, 10.0f, 15.0f, 15.0f, 25.0f, 15.0f, 30.0f};
     float direction_list[6] = {1.0, -1.0, 1.0, 1.0, -1.0, 1.0};
     glm::vec4 color_list[4] = {
         glm::vec4(0.51f, 0.91f, 0.58f, 1.0f),
@@ -36,7 +35,7 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> distr_velocity(75.0f, 100.0f);
+    std::uniform_real_distribution<> distr_velocity(60.0f, 90.0f);
     std::uniform_real_distribution<> distr_position_x(containerBoundary.left + 50.0f, containerBoundary.right - 50.0f);
     std::uniform_real_distribution<> distr_position_y(containerBoundary.bottom + 50.0f, containerBoundary.top - 50.0f);
 
@@ -90,23 +89,26 @@ void Circle::Unbind() {
     GLCall(glBindVertexArray(0));
 }
 
-void Circle::Draw(float deltaTime) {
+void Circle::Draw() {
     Bind();
-
-    for (unsigned int i = 0; i < num_circles; i++) {
-        if (circleData[i].center_radius.x - circleData[i].center_radius.z <= containerBoundary.left || circleData[i].center_radius.x + circleData[i].center_radius.z >= containerBoundary.right) {
-            circleData[i].direction.x *= -1.0;
-        }
-
-        if (circleData[i].center_radius.y - circleData[i].center_radius.z <= containerBoundary.bottom || circleData[i].center_radius.y + circleData[i].center_radius.z >= containerBoundary.top) {
-            circleData[i].direction.y *= -1.0;
-        }
-
-        circleData[i].center_radius.x += float(circleData[i].velocity.x * circleData[i].direction.x * deltaTime);
-        circleData[i].center_radius.y += float(circleData[i].velocity.y * circleData[i].direction.y * deltaTime);
-
-        shader.SetUniform4fv("u_Updates[" + std::to_string(i) + "]", circleData[i].center_radius);
-    }
-
     GLCall(glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, num_circles));
+}
+
+void Circle::Update(float deltaTime) {
+    Bind();
+    for (unsigned int i = 0; i < num_circles; i++) {
+        struct CircleData& cd = circleData[i];
+        if (cd.center_radius.x - cd.center_radius.z <= containerBoundary.left || cd.center_radius.x + cd.center_radius.z >= containerBoundary.right) {
+            cd.direction.x *= -1.0;
+        }
+
+        if (cd.center_radius.y - cd.center_radius.z <= containerBoundary.bottom || cd.center_radius.y + cd.center_radius.z >= containerBoundary.top) {
+            cd.direction.y *= -1.0;
+        }
+
+        cd.center_radius.x += float(cd.velocity.x * cd.direction.x * deltaTime);
+        cd.center_radius.y += float(cd.velocity.y * cd.direction.y * deltaTime);
+
+        shader.SetUniform4fv("u_Updates[" + std::to_string(i) + "]", cd.center_radius);
+    }
 }
