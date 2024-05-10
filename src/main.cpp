@@ -22,7 +22,7 @@ void processInput(GLFWwindow* window);
 
 int main (int argc, char *argv[]) {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -43,20 +43,33 @@ int main (int argc, char *argv[]) {
 
     {
         Container container(1120.0f, 630.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        Circle circle(4, SCR_WIDTH, SCR_HEIGHT);
+        Container containerBG(1125.0f, 635.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.635f, 0.714f, 0.455f, 1.0f));
+        Circle circle(50, SCR_WIDTH, SCR_HEIGHT, container.boundary);
+
+        // deltaTime
+        // -------------------
+        float deltaTime = 0.0f;
+        float lastFrame = 0.0f;
 
         while (!glfwWindowShouldClose(window)) {
             // input
             // -----
             processInput(window);
 
+            // calculate delta time
+            // --------------------
+            float currentFrame = glfwGetTime();
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+
             // render
             // ------
-            GLCall(glClearColor(0.471f, 0.561f, 0.461f, 1.0f));
+            GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
             GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
+            containerBG.Draw();
             container.Draw();
-            circle.Draw();
+            circle.Draw(deltaTime);
 
             // swap buffers and poll IO events
             // -------------------------------

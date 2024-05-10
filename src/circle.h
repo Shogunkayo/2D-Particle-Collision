@@ -1,5 +1,6 @@
 #pragma once
 
+#include "container.h"
 #include "shader.h"
 
 struct CircleData {
@@ -17,13 +18,14 @@ private:
     unsigned int VBO;
     unsigned int EBO;
 
-    struct CircleData circleData[4];
+    struct CircleData circleData[50];
+    struct ContainerBoundary containerBoundary;
 
 public:
-    Circle(int num_circles, const float scr_width, const float scr_height);
+    Circle(int num_circles, const float scr_width, const float scr_height, struct ContainerBoundary containerBoundary);
     ~Circle();
 
     void Bind();
     void Unbind();
-    void Draw();
+    void Draw(float deltaTime);
 };

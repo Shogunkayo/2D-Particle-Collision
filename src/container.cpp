@@ -11,7 +11,7 @@ Container::Container(const float width, const float height, const float scr_widt
     float offset_x = (scr_width - width) / 2;
     float offset_y = (scr_height - height) / 2;
 
-    boundary = { offset_y, offset_y + height, offset_x, offset_x + width };
+    boundary = { offset_y + height, offset_y, offset_x, offset_x + width };
 
     float vertices[] = {
         boundary.right, boundary.top,
