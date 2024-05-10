@@ -1,12 +1,16 @@
 #shader vertex
 #version 330 core
 
-layout(location = 0) in vec4 position;
+layout(location = 0) in vec4 a_Position;
 
-out vec4 v_Position;
+out vec4 u_Update;
+
+uniform mat4 u_MVP;
+uniform vec4 u_Updates[4];
 
 void main() {
-    gl_Position = position;
+    u_Update = u_Updates[gl_InstanceID];
+    gl_Position = u_MVP * (a_Position + vec4(u_Update.xy, 0.0, 0.0));
 };
 
 #shader fragment
@@ -14,19 +18,13 @@ void main() {
 
 layout(location = 0) out vec4 color;
 
-in vec4 v_Position;
+in vec4 u_Update;
 
 uniform vec4 u_Color;
-uniform float u_Size;
-uniform vec4 u_Center;
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / vec2(720, 720) * 2.0 - 1.0;
-
-    if (distance(uv, u_Center.xy) < 0.25) {
+    if (distance(u_Update.xy, gl_FragCoord.xy) < u_Update.z)
         color = u_Color;
-    }
-    else {
+    else
         discard;
-    }
 }

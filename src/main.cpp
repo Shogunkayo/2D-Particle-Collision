@@ -12,6 +12,7 @@
 
 #include "container.h"
 #include "renderer.h"
+#include "circle.h"
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -41,8 +42,8 @@ int main (int argc, char *argv[]) {
     }
 
     {
-
-        Container container(1120.0f, 630.0f, SCR_WIDTH, SCR_HEIGHT, "res/shaders/container.shader", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        Container container(1120.0f, 630.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        Circle circle(4, SCR_WIDTH, SCR_HEIGHT);
 
         while (!glfwWindowShouldClose(window)) {
             // input
@@ -55,6 +56,7 @@ int main (int argc, char *argv[]) {
             GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
             container.Draw();
+            circle.Draw();
 
             // swap buffers and poll IO events
             // -------------------------------

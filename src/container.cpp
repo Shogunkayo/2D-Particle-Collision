@@ -6,8 +6,8 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Container::Container(const float width, const float height, const float scr_width, const float scr_height, const std::string& filepath, const glm::vec4& color)
-    : shader(filepath) {
+Container::Container(const float width, const float height, const float scr_width, const float scr_height, const glm::vec4& color)
+    : shader("res/shaders/container.shader") {
     float offset_x = (scr_width - width) / 2;
     float offset_y = (scr_height - height) / 2;
 
