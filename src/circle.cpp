@@ -29,12 +29,12 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
         1, 2, 3
     };
 
-    float radius1 = 3.0f;
-    float radius2 = 4.0f;
-    float radius3 = 5.0f;
-    float radius4 = 6.0f;
-    float radius5 = 7.0f;
-    float radius6 = 20.0f;
+    float radius1 = 4.0f;
+    float radius2 = 6.0f;
+    float radius3 = 8.0f;
+    float radius4 = 10.0f;
+    float radius5 = 12.0f;
+    float radius6 = 14.0f;
 
     float radius_list[25] = {radius1, radius5, radius1, radius2, radius1, radius4, radius1, radius2, radius1, radius2, radius1, radius2,
         radius1, radius1, radius6, radius4, radius3, radius2, radius2, radius1, radius2, radius2, radius4, radius2, radius3};
@@ -44,6 +44,11 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
         glm::vec4(0.929f, 0.51f, 0.388f, 1.0f),
         glm::vec4(1.0f, 0.922f, 0.612f, 1.0f)
     };
+
+    // DEFAULT COLOR FOR SWEEP AND PRUNE
+    // AS CIRCLE DATA GETS SORTED INPLACE
+    // ----------------------------------
+    glm::vec4 default_color(0.18f, 0.6f, 0.96f, 1.0f);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -57,7 +62,6 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
     }
 
     /*
-
     circleData[0].center_radius = glm::vec4(300.0f, 300.0f, 10.0, 20.0);
     circleData[1].center_radius = glm::vec4(500.0f, 500.0f, 30.0, 30.0);
 
@@ -76,7 +80,8 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
         for (unsigned int i = 0; i < num_circles; i++) {
             shader.SetUniform4fv("u_Updates[" + std::to_string(i) + "]", circleData[i].center_radius);
-            shader.SetUniform4fv("u_Colors[" + std::to_string(i) + "]", color_list[i % 4]);
+            // shader.SetUniform4fv("u_Colors[" + std::to_string(i) + "]", color_list[i % 4]);
+            shader.SetUniform4fv("u_Colors[" + std::to_string(i) + "]", default_color);
         }
 
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
