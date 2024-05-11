@@ -42,7 +42,7 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> distr_velocity(-80.0f, 80.0f);
+    std::uniform_real_distribution<> distr_velocity(30.0f, 40.0f);
     std::uniform_real_distribution<> distr_position_x(containerBoundary.left + 50.0f, containerBoundary.right - 50.0f);
     std::uniform_real_distribution<> distr_position_y(containerBoundary.bottom + 50.0f, containerBoundary.top - 50.0f);
 
@@ -51,6 +51,12 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
         circleData[i].velocity = glm::vec2(float(distr_velocity(gen)), float(distr_velocity(gen)));
         circleData[i].acceleration = glm::vec2(0.0f, 0.0f);
     }
+
+    circleData[0].center_radius = glm::vec4(300.0f, 300.0f, 10.0, 20.0);
+    circleData[1].center_radius = glm::vec4(500.0f, 300.0f, 30.0, 30.0);
+
+    circleData[0].velocity = glm::vec2(-60.0f, 0.0f);
+    circleData[1].velocity = glm::vec2(90.0f, 0.0f);
 
     glm::mat4 proj = glm::ortho(0.0f, scr_width, 0.0f, scr_height, -1.0f, 1.0f);
 

@@ -47,7 +47,7 @@ int main (int argc, char *argv[]) {
     {
         Container container(1120.0f, 630.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         Container containerBG(1125.0f, 635.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.635f, 0.714f, 0.455f, 1.0f));
-        Circle circle(10, SCR_WIDTH, SCR_HEIGHT, container.boundary);
+        Circle circle(2, SCR_WIDTH, SCR_HEIGHT, container.boundary);
 
         // deltaTime
         // -------------------

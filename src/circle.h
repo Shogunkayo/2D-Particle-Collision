@@ -17,7 +17,7 @@ private:
     unsigned int VBO;
     unsigned int EBO;
 
-    struct CircleData circleData[10];
+    struct CircleData circleData[2];
     struct ContainerBoundary containerBoundary;
 
 public:
