@@ -18,7 +18,7 @@ private:
     unsigned int VBO;
     unsigned int EBO;
 
-    struct CircleData circleData[10];
+    struct CircleData circleData[2];
     struct ContainerBoundary containerBoundary;
 
 public:
@@ -29,5 +29,6 @@ public:
     void Unbind();
     void Draw();
     void Update(float deltaTime);
-    void NaiveCollision();
+    void Update(float deltaTime, const unsigned int i, const unsigned int j);
+    void NaiveCollision(float deltaTime);
 };
