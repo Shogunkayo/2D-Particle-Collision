@@ -6,7 +6,6 @@
 struct CircleData {
     glm::vec4 center_radius;
     glm::vec2 velocity;
-    glm::vec2 acceleration;
 };
 
 class Circle {
@@ -17,7 +16,7 @@ private:
     unsigned int VBO;
     unsigned int EBO;
 
-    struct CircleData circleData[50];
+    struct CircleData circleData[1000];
     struct ContainerBoundary containerBoundary;
 
 public:
@@ -30,4 +29,5 @@ public:
     void Update(float deltaTime);
     void Update(float deltaTime, const unsigned int i, const unsigned int j);
     void NaiveCollision(float deltaTime);
+    void SweepAndPrune(float deltaTime);
 };

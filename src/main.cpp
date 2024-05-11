@@ -14,8 +14,8 @@
 #include "renderer.h"
 #include "circle.h"
 
-const unsigned int SCR_WIDTH = 1280;
-const unsigned int SCR_HEIGHT = 720;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -45,9 +45,9 @@ int main (int argc, char *argv[]) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     {
-        Container container(1120.0f, 630.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        Container containerBG(1125.0f, 635.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.635f, 0.714f, 0.455f, 1.0f));
-        Circle circle(50, SCR_WIDTH, SCR_HEIGHT, container.boundary);
+        Container container(1680.0f, 945.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        Container containerBG(1685.0f, 950.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.635f, 0.714f, 0.455f, 1.0f));
+        Circle circle(100, SCR_WIDTH, SCR_HEIGHT, container.boundary);
 
         // deltaTime
         // -------------------
@@ -72,7 +72,8 @@ int main (int argc, char *argv[]) {
 
             containerBG.Draw();
             container.Draw();
-            circle.NaiveCollision(deltaTime);
+            // circle.NaiveCollision(deltaTime);
+            circle.SweepAndPrune(deltaTime);
             circle.Update(deltaTime);
             circle.Draw();
 

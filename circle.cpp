@@ -6,6 +6,7 @@
 #include <map>
 #include <functional>
 #include <set>
+#include <omp.h>
 
 class Circle
 {
@@ -105,6 +106,7 @@ void sweep_and_prune()
 
     std::set <Circle*> x;
 
+    #pragma omp for
     for(int i = 0; i < particles.size() - 1; i++)
     {
         if(intersect(particles[i], particles[i + 1]))
@@ -114,9 +116,13 @@ void sweep_and_prune()
         }
     }
 
+    #pragma omp for
     for(auto i : x)
         active_list.push_back(i);
 
+    sort(active_list.begin(), active_list.end(), compareParticles);
+
+    // #pragma omp for
     // for(auto i : active_list)
     // {
     //     std::cout << i->px << " ";
@@ -128,7 +134,7 @@ void sweep_and_prune()
 int main() 
 {
     // Create a circle inside the box
-    Circle circle1(710, 690, 100, 100, 0, 0, 1, 10);
+    Circle circle1(709, 690, 100, 100, 0, 0, 1, 10);
     Circle circle2(730, 690, 100, 100, 0, 0, 1, 10);
     Circle circle3(735, 690, 100, 100, 0, 0, 1, 10);
     Circle circle4(800, 690, 100, 100, 0, 0, 1, 10);
@@ -178,6 +184,7 @@ void Circle::handleParticleCollision()
     {
         int done = 0;
 
+        #pragma omp for
         for(auto itr = completed_collisions.find(this); itr != completed_collisions.end(); itr++)
             if(itr->second == p)
                 done = 1;

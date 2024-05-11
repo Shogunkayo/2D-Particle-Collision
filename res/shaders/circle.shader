@@ -7,8 +7,8 @@ out vec4 u_Update;
 out vec4 u_Color;
 
 uniform mat4 u_MVP;
-uniform vec4 u_Updates[50];
-uniform vec4 u_Colors[50];
+uniform vec4 u_Updates[1000];
+uniform vec4 u_Colors[1000];
 
 void main() {
     u_Color = u_Colors[gl_InstanceID];
