@@ -25,7 +25,6 @@ in vec4 u_Update;
 in vec4 u_Color;
 
 void main() {
-
     float d = u_Update.z - distance(u_Update.xy, gl_FragCoord.xy);
     color = u_Color;
     color.a = exp(d);

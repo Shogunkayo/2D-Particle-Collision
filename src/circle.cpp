@@ -5,6 +5,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float2.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <random>
@@ -52,13 +53,11 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
         circleData[i].acceleration = glm::vec2(0.0f, 0.0f);
     }
 
-    /*
     circleData[0].center_radius = glm::vec4(300.0f, 300.0f, 10.0, 20.0);
     circleData[1].center_radius = glm::vec4(500.0f, 500.0f, 30.0, 30.0);
 
     circleData[0].velocity = glm::vec2(60.0f, 0.0f);
     circleData[1].velocity = glm::vec2(0.0f, -50.0f);
-    */
 
     glm::mat4 proj = glm::ortho(0.0f, scr_width, 0.0f, scr_height, -1.0f, 1.0f);
 
@@ -128,30 +127,30 @@ void Circle::Update(float deltaTime) {
 }
 
 void Circle::Update(float deltaTime, const unsigned int i, const unsigned int j) {
-    float x2 = circleData[i].center_radius.x - circleData[j].center_radius.x;
-    float y2 = circleData[i].center_radius.y - circleData[j].center_radius.y;
-    float r2 = circleData[i].center_radius.z + circleData[j].center_radius.z;
-    while((x2 * x2) + (y2 * y2) <= (r2 * r2)) {
+        //std::cout << "Overlap\n";
         circleData[i].center_radius.x += float(circleData[i].velocity.x * deltaTime);
-        circleData[i].center_radius.y += float(circleData[j].velocity.y * deltaTime);
+        circleData[i].center_radius.y += float(circleData[i].velocity.y * deltaTime);
         
         circleData[j].center_radius.x += float(circleData[j].velocity.x * deltaTime);
         circleData[j].center_radius.y += float(circleData[j].velocity.y * deltaTime);
 
-        x2 = circleData[i].center_radius.x - circleData[j].center_radius.x;
-        y2 = circleData[i].center_radius.y - circleData[j].center_radius.y;
-        r2 = circleData[i].center_radius.z + circleData[j].center_radius.z;
-    }
 }
 
 void Circle::NaiveCollision(float deltaTime) {
     for (unsigned int i = 0; i < num_circles; i++) {
         for (unsigned int j = 0; j < num_circles; j++) {
             if (i != j) {
-                float x2 = circleData[i].center_radius.x - circleData[j].center_radius.x;
-                float y2 = circleData[i].center_radius.y - circleData[j].center_radius.y;
-                float r2 = circleData[i].center_radius.z + circleData[j].center_radius.z;
+                float x2 = circleData[j].center_radius.x - circleData[i].center_radius.x;
+                float y2 = circleData[j].center_radius.y - circleData[i].center_radius.y;
+                float r2 = circleData[j].center_radius.z + circleData[i].center_radius.z;
                 if ((x2 * x2) + (y2 * y2) <= (r2 * r2)) {
+
+                    /*
+                    std::cout << "BEFORE::Circle 1::velocity: " << circleData[i].velocity.x << " " << circleData[i].velocity.y << "\n";
+                    std::cout << "BEFORE::Circle 1::center: " << circleData[i].center_radius.x << " " << circleData[i].center_radius.y << "\n";
+                    std::cout << "BEFORE::Circle 2::velocity: " << circleData[j].velocity.x << " " << circleData[j].velocity.y << "\n";
+                    std::cout << "BEFORE::Circle 2::center: " << circleData[j].center_radius.x << " " << circleData[j].center_radius.y << "\n";
+                    */
 
                     float m1 = circleData[i].center_radius.z;
                     float m2 = circleData[j].center_radius.z;
@@ -160,18 +159,62 @@ void Circle::NaiveCollision(float deltaTime) {
                     float v1y = circleData[i].velocity.y;
                     float v2y = circleData[j].velocity.y;
 
-                    std::cout << "BEFORE::Circle 1::velocity: " << circleData[i].velocity.x << " " << circleData[i].velocity.y << "\n";
-                    std::cout << "BEFORE::Circle 2::velocity: " << circleData[j].velocity.x << " " << circleData[j].velocity.y << "\n";
+                    glm::vec2 v1 = circleData[i].velocity;
+                    glm::vec2 v2 = circleData[j].velocity;
 
+                    glm::vec2 normal = glm::vec2(x2, y2);
+                    glm::vec2 unit_normal = normal / glm::length(normal);
+                    glm::vec2 unit_tangent = glm::vec2(-unit_normal.y, unit_normal.x);
+
+                    float v1_normal = glm::dot(unit_normal, v1);
+                    float v1_tangent = glm::dot(unit_tangent, v1);
+                    float v2_normal = glm::dot(unit_normal, v2);
+                    float v2_tangent = glm::dot(unit_tangent, v2);
+
+                    float v1_f_normal = float(((v1_normal * (m1 - m2)) + (2 * m2 * v2_normal)) / (m1 + m2)); 
+                    float v2_f_normal = float(((v2_normal * (m2 - m1)) + (2 * m1 * v1_normal)) / (m1 + m2));
+
+                    glm::vec2 v1_f_normal_vec = v1_f_normal * unit_normal;
+                    glm::vec2 v1_f_tangent_vec = v1_tangent * unit_tangent;
+
+                    glm::vec2 v2_f_normal_vec = v2_f_normal * unit_normal;
+                    glm::vec2 v2_f_tangent_vec = v2_tangent * unit_tangent;
+
+                    circleData[i].velocity = v1_f_normal_vec + v1_f_tangent_vec;
+                    circleData[j].velocity = v2_f_normal_vec + v2_f_tangent_vec;
+
+                    /*
+                    std::cout <<"\nINTERMEDIATES::\n";
+                    std::cout << "Normal: "<< normal.x << " " << normal.y << "\n";
+                    std::cout << "Unit_normal: " << unit_normal.x << " " << unit_normal.y << "\n";
+                    std::cout << "Unit_tangent: " << unit_tangent.x << " " << unit_tangent.y << "\n";
+                    std::cout << "v1n: " << v1_normal << "\n";
+                    std::cout << "v1t: " << v1_tangent << "\n";
+                    std::cout << "v2n: " << v2_normal << "\n";
+                    std::cout << "v2t: " << v2_tangent << "\n";
+
+                    std::cout << "v1fn: " << v1_f_normal << "\n";
+                    std::cout << "v2fn: " << v2_f_normal << "\n";
+
+                    std::cout << "v1fnv: " << v1_f_normal_vec.x << " " << v1_f_normal_vec.y << "\n";
+                    std::cout << "v2fnv: " << v2_f_normal_vec.x << " " << v2_f_normal_vec.y << "\n";
+                    std::cout << "v1ftv: " << v1_f_tangent_vec.x << " " << v1_f_tangent_vec.y << "\n";
+                    std::cout << "v2ftv: " << v2_f_tangent_vec.x << " " << v2_f_tangent_vec.y << "\n";
+                    */
+
+                    /*
                     circleData[i].velocity.x = float((((m1 - m2) * v1x) + (2 * m2 * v2x)) / r2);
                     circleData[i].velocity.y = float((((m1 - m2) * v1y) + (2 * m2 * v2y)) / r2);
 
                     circleData[j].velocity.x = float(((2 * m1 * v1x) + ((m2 - m1) * v2x)) / r2);
                     circleData[j].velocity.y = float(((2 * m1 * v1y) + ((m2 - m1) * v2y)) / r2);
+                    */
 
+                    /*
                     std::cout << "AFTER::Circle 1::velocity: " << circleData[i].velocity.x << " " << circleData[i].velocity.y << "\n";
                     std::cout << "AFTER::Circle 2::velocity: " << circleData[j].velocity.x << " " << circleData[j].velocity.y << "\n";
-                    
+                    */
+
                     Update(deltaTime, i, j);
                 }
             }
