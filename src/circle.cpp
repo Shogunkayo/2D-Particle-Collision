@@ -33,7 +33,6 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
     float radius_list[25] = {radius1, radius5, radius1, radius2, radius1, radius4, radius1, radius2, radius1, radius2, radius1, radius2,
         radius1, radius1, radius6, radius4, radius3, radius2, radius2, radius1, radius2, radius2, radius4, radius2, radius3};
-    float direction_list[6] = {1.0, -1.0, 1.0, 1.0, -1.0, 1.0};
     glm::vec4 color_list[4] = {
         glm::vec4(0.51f, 0.91f, 0.58f, 1.0f),
         glm::vec4(0.18f, 0.6f, 0.96f, 1.0f),
@@ -43,26 +42,15 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> distr_velocity(30.0f, 40.0f);
+    std::uniform_real_distribution<> distr_velocity(-80.0f, 80.0f);
     std::uniform_real_distribution<> distr_position_x(containerBoundary.left + 50.0f, containerBoundary.right - 50.0f);
     std::uniform_real_distribution<> distr_position_y(containerBoundary.bottom + 50.0f, containerBoundary.top - 50.0f);
 
     for (int i = 0; i < num_circles; i++) {
         circleData[i].center_radius = glm::vec4(float(distr_position_x(gen)), float(distr_position_y(gen)), radius_list[i % 25], radius_list[i % 25]);
         circleData[i].velocity = glm::vec2(float(distr_velocity(gen)), float(distr_velocity(gen)));
-        circleData[i].direction = glm::vec2(direction_list[i % 6], direction_list[6 - (i % 6)]);
         circleData[i].acceleration = glm::vec2(0.0f, 0.0f);
     }
-
-    circleData[0].center_radius = glm::vec4(300.0f, 200.0f, 20.0, 20.0);
-    circleData[1].center_radius = glm::vec4(600.0f, 200.0f, 30.0, 20.0);
-
-    circleData[0].velocity = glm::vec2(30.0f, 0.0f);
-    circleData[1].velocity = glm::vec2(50.0f, 0.0f);
-
-    circleData[0].direction = glm::vec2(1.0f, 1.0f);
-    circleData[1].direction = glm::vec2(-1.0f, -1.0f);
-
 
     glm::mat4 proj = glm::ortho(0.0f, scr_width, 0.0f, scr_height, -1.0f, 1.0f);
 
@@ -117,29 +105,26 @@ void Circle::Update(float deltaTime) {
     for (unsigned int i = 0; i < num_circles; i++) {
         struct CircleData& cd = circleData[i];
         if (cd.center_radius.x - cd.center_radius.z <= containerBoundary.left || cd.center_radius.x + cd.center_radius.z >= containerBoundary.right) {
-            cd.direction.x *= -1.0;
+            cd.velocity.x *= -1.0;
         }
 
         if (cd.center_radius.y - cd.center_radius.z <= containerBoundary.bottom || cd.center_radius.y + cd.center_radius.z >= containerBoundary.top) {
-            cd.direction.y *= -1.0;
+            cd.velocity.y *= -1.0;
         }
 
-        cd.center_radius.x += float(cd.velocity.x * cd.direction.x * deltaTime);
-        cd.center_radius.y += float(cd.velocity.y * cd.direction.y * deltaTime);
+        cd.center_radius.x += float(cd.velocity.x * deltaTime);
+        cd.center_radius.y += float(cd.velocity.y * deltaTime);
 
         shader.SetUniform4fv("u_Updates[" + std::to_string(i) + "]", cd.center_radius);
     }
 }
 
 void Circle::Update(float deltaTime, const unsigned int i, const unsigned int j) {
-    std::cout << "COLLISION UPDATE\n";
-    circleData[i].direction *= -1;
-    circleData[i].center_radius.x += float(circleData[i].velocity.x * circleData[i].direction.x * deltaTime);
-    circleData[i].center_radius.y += float(circleData[j].velocity.y * circleData[j].direction.y * deltaTime);
-
-    circleData[j].direction *= -1;
-    circleData[j].center_radius.x += float(circleData[j].velocity.x * circleData[j].direction.x * deltaTime);
-    circleData[j].center_radius.y += float(circleData[j].velocity.y * circleData[j].direction.y * deltaTime);
+    circleData[i].center_radius.x += float(circleData[i].velocity.x * deltaTime);
+    circleData[i].center_radius.y += float(circleData[j].velocity.y * deltaTime);
+    
+    circleData[j].center_radius.x += float(circleData[j].velocity.x * deltaTime);
+    circleData[j].center_radius.y += float(circleData[j].velocity.y * deltaTime);
 }
 
 void Circle::NaiveCollision(float deltaTime) {
@@ -150,6 +135,7 @@ void Circle::NaiveCollision(float deltaTime) {
                 float y2 = circleData[i].center_radius.y - circleData[j].center_radius.y;
                 float r2 = circleData[i].center_radius.z + circleData[j].center_radius.z;
                 if ((x2 * x2) + (y2 * y2) <= (r2 * r2)) {
+
                     float m1 = circleData[i].center_radius.z;
                     float m2 = circleData[j].center_radius.z;
                     float v1x = circleData[i].velocity.x;
@@ -157,16 +143,11 @@ void Circle::NaiveCollision(float deltaTime) {
                     float v1y = circleData[i].velocity.y;
                     float v2y = circleData[j].velocity.y;
 
-                    std::cout << "BEFORE::Circle 1::velocity: " << circleData[0].velocity.x << " " << circleData[0].velocity.y << "\n";
-                    std::cout << "BEFORE::Circle 2::velocity: " << circleData[1].velocity.x << " " << circleData[1].velocity.y << "\n";
-                    circleData[i].velocity.x = (((m1 - m2) * v1x) + (2 * m2 * v2x)) / r2;
-                    circleData[i].velocity.y = (((m1 - m2) * v1y) + (2 * m2 * v2y)) / r2;
+                    circleData[i].velocity.x = float((((m1 - m2) * v1x) + (2 * m2 * v2x)) / r2);
+                    circleData[i].velocity.y = float((((m1 - m2) * v1y) + (2 * m2 * v2y)) / r2);
 
-                    circleData[j].velocity.x = ((2 * m1 * v1x) + ((m2 - m1) * v2x)) / r2;
-                    circleData[j].velocity.y = ((2 * m1 * v1y) + ((m2 - m1) * v2y)) / r2;
-
-                    std::cout << "AFTER::Circle 1::velocity: " << circleData[0].velocity.x << " " << circleData[0].velocity.y << "\n";
-                    std::cout << "AFTER::Circle 2::velocity: " << circleData[1].velocity.x << " " << circleData[1].velocity.y << "\n";
+                    circleData[j].velocity.x = float(((2 * m1 * v1x) + ((m2 - m1) * v2x)) / r2);
+                    circleData[j].velocity.y = float(((2 * m1 * v1y) + ((m2 - m1) * v2y)) / r2);
 
                     Update(deltaTime, i, j);
                 }

@@ -6,7 +6,6 @@
 struct CircleData {
     glm::vec4 center_radius;
     glm::vec2 velocity;
-    glm::vec2 direction;
     glm::vec2 acceleration;
 };
 
@@ -18,7 +17,7 @@ private:
     unsigned int VBO;
     unsigned int EBO;
 
-    struct CircleData circleData[2];
+    struct CircleData circleData[10];
     struct ContainerBoundary containerBoundary;
 
 public:
