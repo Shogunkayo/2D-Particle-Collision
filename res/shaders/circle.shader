@@ -7,8 +7,8 @@ out vec4 u_Update;
 out vec4 u_Color;
 
 uniform mat4 u_MVP;
-uniform vec4 u_Updates[50];
-uniform vec4 u_Colors[50];
+uniform vec4 u_Updates[10];
+uniform vec4 u_Colors[10];
 
 void main() {
     u_Color = u_Colors[gl_InstanceID];
@@ -25,8 +25,8 @@ in vec4 u_Update;
 in vec4 u_Color;
 
 void main() {
-    if (distance(u_Update.xy, gl_FragCoord.xy) < u_Update.z)
-        color = u_Color;
-    else
-        discard;
+
+    float d = u_Update.z - distance(u_Update.xy, gl_FragCoord.xy);
+    color = u_Color;
+    color.a = exp(d);
 }

@@ -23,8 +23,15 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
         1, 2, 3
     };
 
-    float radius_list[25] = {10.0f, 30.0f, 10.0f, 15.0f, 10.0f, 25.0f, 10.0f, 15.0f, 10.0f, 15.0f, 10.0f, 15.0f,
-        10.0f, 10.0f, 35.0f, 20.0f, 20.0f, 15.0f, 15.0f, 10.0f, 15.0f, 15.0f, 25.0f, 15.0f, 30.0f};
+    float radius1 = 10.0f;
+    float radius2 = 15.0f;
+    float radius3 = 20.0f;
+    float radius4 = 25.0f;
+    float radius5 = 30.0f;
+    float radius6 = 35.0f;
+
+    float radius_list[25] = {radius1, radius5, radius1, radius2, radius1, radius4, radius1, radius2, radius1, radius2, radius1, radius2,
+        radius1, radius1, radius6, radius4, radius3, radius2, radius2, radius1, radius2, radius2, radius4, radius2, radius3};
     float direction_list[6] = {1.0, -1.0, 1.0, 1.0, -1.0, 1.0};
     glm::vec4 color_list[4] = {
         glm::vec4(0.51f, 0.91f, 0.58f, 1.0f),
@@ -35,7 +42,7 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> distr_velocity(60.0f, 90.0f);
+    std::uniform_real_distribution<> distr_velocity(30.0f, 40.0f);
     std::uniform_real_distribution<> distr_position_x(containerBoundary.left + 50.0f, containerBoundary.right - 50.0f);
     std::uniform_real_distribution<> distr_position_y(containerBoundary.bottom + 50.0f, containerBoundary.top - 50.0f);
 
@@ -110,5 +117,24 @@ void Circle::Update(float deltaTime) {
         cd.center_radius.y += float(cd.velocity.y * cd.direction.y * deltaTime);
 
         shader.SetUniform4fv("u_Updates[" + std::to_string(i) + "]", cd.center_radius);
+    }
+}
+
+void Circle::NaiveCollision() {
+    for (unsigned int i = 0; i < num_circles; i++) {
+        for (unsigned int j = 0; j < num_circles; j++) {
+            if (i != j) {
+                float x2 = circleData[i].center_radius.x - circleData[j].center_radius.x;
+                float y2 = circleData[i].center_radius.y - circleData[j].center_radius.y;
+                float r2 = circleData[i].center_radius.z + circleData[j].center_radius.z;
+                if ((x2 * x2) + (y2 * y2) <= (r2 * r2)) {
+                    circleData[i].velocity.x = (((circleData[i].center_radius.z - circleData[j].center_radius.z) * circleData[i].velocity.x) + (2 * circleData[j].center_radius.z * circleData[j].velocity.x)) / r2;
+                    circleData[i].velocity.y = (((circleData[i].center_radius.z - circleData[j].center_radius.z) * circleData[i].velocity.y) + (2 * circleData[j].center_radius.z * circleData[j].velocity.y)) / r2;
+
+                    circleData[j].velocity.x = ((2 * circleData[i].center_radius.z * circleData[i].velocity.x) + ((circleData[j].center_radius.z - circleData[i].center_radius.z) * circleData[j].velocity.y)) / r2;
+                    circleData[j].velocity.y = ((2 * circleData[i].center_radius.z * circleData[i].velocity.y) + ((circleData[j].center_radius.z - circleData[i].center_radius.y) * circleData[j].velocity.y)) / r2;
+                }
+            }
+        }
     }
 }

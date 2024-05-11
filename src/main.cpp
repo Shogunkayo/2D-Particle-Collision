@@ -41,10 +41,13 @@ int main (int argc, char *argv[]) {
         return -1;
     }
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     {
         Container container(1120.0f, 630.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         Container containerBG(1125.0f, 635.0f, SCR_WIDTH, SCR_HEIGHT, glm::vec4(0.635f, 0.714f, 0.455f, 1.0f));
-        Circle circle(50, SCR_WIDTH, SCR_HEIGHT, container.boundary);
+        Circle circle(10, SCR_WIDTH, SCR_HEIGHT, container.boundary);
 
         // deltaTime
         // -------------------
@@ -69,6 +72,7 @@ int main (int argc, char *argv[]) {
 
             containerBG.Draw();
             container.Draw();
+            circle.NaiveCollision();
             circle.Update(deltaTime);
             circle.Draw();
 
