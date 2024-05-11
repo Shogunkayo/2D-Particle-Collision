@@ -42,7 +42,7 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> distr_velocity(30.0f, 40.0f);
+    std::uniform_real_distribution<> distr_velocity(-80.0f, 80.0f);
     std::uniform_real_distribution<> distr_position_x(containerBoundary.left + 50.0f, containerBoundary.right - 50.0f);
     std::uniform_real_distribution<> distr_position_y(containerBoundary.bottom + 50.0f, containerBoundary.top - 50.0f);
 
@@ -52,11 +52,13 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
         circleData[i].acceleration = glm::vec2(0.0f, 0.0f);
     }
 
+    /*
     circleData[0].center_radius = glm::vec4(300.0f, 300.0f, 10.0, 20.0);
-    circleData[1].center_radius = glm::vec4(500.0f, 300.0f, 30.0, 30.0);
+    circleData[1].center_radius = glm::vec4(500.0f, 500.0f, 30.0, 30.0);
 
-    circleData[0].velocity = glm::vec2(-60.0f, 0.0f);
-    circleData[1].velocity = glm::vec2(90.0f, 0.0f);
+    circleData[0].velocity = glm::vec2(60.0f, 0.0f);
+    circleData[1].velocity = glm::vec2(0.0f, -50.0f);
+    */
 
     glm::mat4 proj = glm::ortho(0.0f, scr_width, 0.0f, scr_height, -1.0f, 1.0f);
 
@@ -126,11 +128,20 @@ void Circle::Update(float deltaTime) {
 }
 
 void Circle::Update(float deltaTime, const unsigned int i, const unsigned int j) {
-    circleData[i].center_radius.x += float(circleData[i].velocity.x * deltaTime);
-    circleData[i].center_radius.y += float(circleData[j].velocity.y * deltaTime);
-    
-    circleData[j].center_radius.x += float(circleData[j].velocity.x * deltaTime);
-    circleData[j].center_radius.y += float(circleData[j].velocity.y * deltaTime);
+    float x2 = circleData[i].center_radius.x - circleData[j].center_radius.x;
+    float y2 = circleData[i].center_radius.y - circleData[j].center_radius.y;
+    float r2 = circleData[i].center_radius.z + circleData[j].center_radius.z;
+    while((x2 * x2) + (y2 * y2) <= (r2 * r2)) {
+        circleData[i].center_radius.x += float(circleData[i].velocity.x * deltaTime);
+        circleData[i].center_radius.y += float(circleData[j].velocity.y * deltaTime);
+        
+        circleData[j].center_radius.x += float(circleData[j].velocity.x * deltaTime);
+        circleData[j].center_radius.y += float(circleData[j].velocity.y * deltaTime);
+
+        x2 = circleData[i].center_radius.x - circleData[j].center_radius.x;
+        y2 = circleData[i].center_radius.y - circleData[j].center_radius.y;
+        r2 = circleData[i].center_radius.z + circleData[j].center_radius.z;
+    }
 }
 
 void Circle::NaiveCollision(float deltaTime) {
@@ -149,12 +160,18 @@ void Circle::NaiveCollision(float deltaTime) {
                     float v1y = circleData[i].velocity.y;
                     float v2y = circleData[j].velocity.y;
 
+                    std::cout << "BEFORE::Circle 1::velocity: " << circleData[i].velocity.x << " " << circleData[i].velocity.y << "\n";
+                    std::cout << "BEFORE::Circle 2::velocity: " << circleData[j].velocity.x << " " << circleData[j].velocity.y << "\n";
+
                     circleData[i].velocity.x = float((((m1 - m2) * v1x) + (2 * m2 * v2x)) / r2);
                     circleData[i].velocity.y = float((((m1 - m2) * v1y) + (2 * m2 * v2y)) / r2);
 
                     circleData[j].velocity.x = float(((2 * m1 * v1x) + ((m2 - m1) * v2x)) / r2);
                     circleData[j].velocity.y = float(((2 * m1 * v1y) + ((m2 - m1) * v2y)) / r2);
 
+                    std::cout << "AFTER::Circle 1::velocity: " << circleData[i].velocity.x << " " << circleData[i].velocity.y << "\n";
+                    std::cout << "AFTER::Circle 2::velocity: " << circleData[j].velocity.x << " " << circleData[j].velocity.y << "\n";
+                    
                     Update(deltaTime, i, j);
                 }
             }
