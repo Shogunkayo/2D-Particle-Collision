@@ -8,6 +8,7 @@ This project is an implementation of a 2D particle collision simulation.
 - Each collision is treated as a perfectly elastic collision.
 
 ## Demo
+[![demo](https://github.com/Shogunkayo/2D-Particle-Collision/blob/master/demo/2dparticle.png)](https://github.com/Shogunkayo/2D-Particle-Collision/blob/master/demo/demo.mp4)
 
 ## High Level implementation
 
