@@ -51,7 +51,7 @@ int main (int argc, char *argv[]) {
 
         // deltaTime
         // -------------------
-        float deltaTime = 1.0f / 60.0f;
+        float deltaTime = 1.0f / 144.0f;
         // float lastFrame = 0.0f;
 
         while (!glfwWindowShouldClose(window)) {
@@ -72,8 +72,8 @@ int main (int argc, char *argv[]) {
 
             containerBG.Draw();
             container.Draw();
-            // circle.NaiveCollision(deltaTime);
-            circle.SweepAndPrune(deltaTime);
+            circle.NaiveCollision(deltaTime);
+            // circle.SweepAndPrune(deltaTime);
             circle.Update(deltaTime);
             circle.Draw();
 

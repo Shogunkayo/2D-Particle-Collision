@@ -8,7 +8,6 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 #include <random>
 #include <unordered_set>
 #include <string>
@@ -80,8 +79,8 @@ Circle::Circle(int num_circles, const float scr_width, const float scr_height, s
 
         for (unsigned int i = 0; i < num_circles; i++) {
             shader.SetUniform4fv("u_Updates[" + std::to_string(i) + "]", circleData[i].center_radius);
-            // shader.SetUniform4fv("u_Colors[" + std::to_string(i) + "]", color_list[i % 4]);
-            shader.SetUniform4fv("u_Colors[" + std::to_string(i) + "]", default_color);
+            shader.SetUniform4fv("u_Colors[" + std::to_string(i) + "]", color_list[i % 4]);
+            // shader.SetUniform4fv("u_Colors[" + std::to_string(i) + "]", default_color);
         }
 
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
